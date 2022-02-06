@@ -55,7 +55,6 @@ function App() {
     <div className="App">
       <Header addTask={addTask}/>
       <ToDoList ToDoList={toDoList} HandleToggle={HandleToggle}  EditList={EditList}/>
-      <ButtonClear HandleClear1={HandleClear1}/>
     </div>
   );
 }
