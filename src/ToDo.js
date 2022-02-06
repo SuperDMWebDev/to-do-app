@@ -37,7 +37,7 @@ const ToDo = ({todo, editlist ,handletoggle,i}) => {
 
     
     return (
-        <div id={todo.id+"task"} className="task">
+        <div id={todo.id+"task"} key={todo.id} className="task">
                     <div className="content">
                         <input id={todo.id} type="text" className={todo.complete? "text caret-hidden strike": "caret-hidden text"} onClick={handleClick} placeholder={todo.task} defaultValue={todo.task}  readOnly/>
                     </div>

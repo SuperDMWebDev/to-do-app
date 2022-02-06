@@ -13,7 +13,7 @@ const ToDoList = ({ToDoList, EditList ,HandleToggle}) => {
                             {
                                 ToDoList.map((todo,i)=>{
                                     return(                           
-                                 <ToDo todo={todo} i={i} editlist={EditList} handletoggle={HandleToggle}/>
+                                 <ToDo todo={todo} key={todo.id} i={i} editlist={EditList} handletoggle={HandleToggle}/>
  
                                     )
                                 })
