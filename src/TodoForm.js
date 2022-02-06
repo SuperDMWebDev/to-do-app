@@ -16,10 +16,21 @@ const ToDoForm =({addTask})=>{
     const handleChange=(e)=>{
         setUserInput(e.currentTarget.value);
     }
+    const handleMove = (e) => {
+     
+        const substring=e.currentTarget.id.substring(0,1);
+        console.log(substring);
+        const a=document.getElementsByClassName("task");
+        for(let i=0;i<a.length;i++)
+        {
+            a[i].classList.add("draggable");
+        }
+    };
     return(
         <form onSubmit={handleSubmit} id="new-task-form">
             <input value={userInput} name="new-text-input" id="new-task-input" type="text" onChange={handleChange} placeholder="Please input task"/>
             <input type="submit" id="new-task-submit" value="Add task" />
+          
         </form>  
     );
 }

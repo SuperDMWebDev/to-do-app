@@ -1,85 +1,120 @@
-// window.addEventListener('load', () => {
-//     const form = document.getElementById("new-task-form");
-//     const input = document.getElementById("new-task-input");
-//     const list_el = document.getElementById("tasks");
+document.addEventListener('DOMContentLoaded', function () {
+    // Query the list element
+    const list = document.getElementById('tasks');
 
-//     form.addEventListener('submit', (e) => {
-//         e.preventDefault();
-//         const taskInput = input.value;
-//         if (!taskInput) {
-//             alert("Please input task");
-//             return;
-//         } else {
-//             const task = document.createElement('div');
-//             task.classList.add('task');
-//             const content = document.createElement('content');
-//             content.classList.add('content');
+    let draggingEle;
+    let placeholder;
+    let isDraggingStarted = false;
 
-//             task.appendChild(content);
+    // The current position of mouse relative to the dragging element
+    let x = 0;
+    let y = 0;
 
-//             const inputContent = document.createElement('input');
-//             inputContent.type = "text";
-//             inputContent.classList.add('text');
-//             inputContent.setAttribute('value', taskInput);
-//             inputContent.setAttribute("readonly", "readonly");
-//             inputContent.classList.add("caret-hidden");
-//             console.log(task);
-//             content.appendChild(inputContent);
-//             const actions = document.createElement("div");
-//             actions.classList.add("actions");
+    // Swap two nodes
+    const swap = function (nodeA, nodeB) {
+        const parentA = nodeA.parentNode;
+        const siblingA = nodeA.nextSibling === nodeB ? nodeA : nodeA.nextSibling;
 
-//             const button1 = document.createElement("button");
-//             button1.classList.add("edit");
-//             button1.value = "edit";
-//             const iconEdit=document.createElement("i");
-//             iconEdit.classList.add("bi","bi-pencil-square");
-//             button1.appendChild(iconEdit);
-//             const button2 = document.createElement("button");
-//             button2.classList.add("delete");
-//             const iconDelete=document.createElement("i");
-//             iconDelete.classList.add('bi','bi-trash');
-//             button2.appendChild(iconDelete);
-//             actions.appendChild(button1);
-//             actions.appendChild(button2);
-//             const iconSave=document.createElement("i");
-//             iconSave.classList.add("bi","bi-save");
-//             task.appendChild(actions);
+        // Move `nodeA` to before the `nodeB`
+        nodeB.parentNode.insertBefore(nodeA, nodeB);
 
-//             list_el.appendChild(task);
-//             input.value = '';
+        // Move `nodeB` to before the sibling of `nodeA`
+        parentA.insertBefore(nodeB, siblingA);
+    };
 
+    // Check if `nodeA` is above `nodeB`
+    const isAbove = function (nodeA, nodeB) {
+        // Get the bounding rectangle of nodes
+        const rectA = nodeA.getBoundingClientRect();
+        const rectB = nodeB.getBoundingClientRect();
 
+        return rectA.top + rectA.height / 2 < rectB.top + rectB.height / 2;
+    };
 
-//             // xu ly viec nhan nut edit
-//             button1.addEventListener('click', (e) => {
-//                 if (button1.value == "edit") {
-//                     inputContent.removeAttribute("readonly");
-//                     inputContent.classList.remove("caret-hidden")
-//                     inputContent.focus();
-//                     button1.value = "save"
-//                     button1.removeChild(iconEdit);
-//                     button1.appendChild(iconSave);
-                    
-//                 } else {
-//                     if (inputContent.value == "") {
-//                         list_el.removeChild(task);
-//                     } else {
-//                         inputContent.setAttribute("readonly", "readonly");
-//                         button1.value = "edit";
-//                         inputContent.classList.add("caret-hidden");
-//                         button1.removeChild(iconSave);
-//                         button1.appendChild(iconEdit);
-//                     }
+    const mouseDownHandler = function (e) {
+        draggingEle = e.target;
 
+        // Calculate the mouse position
+        const rect = draggingEle.getBoundingClientRect();
+        x = e.pageX - rect.left;
+        y = e.pageY - rect.top;
 
-//                 }
-//             })
+        // Attach the listeners to `document`
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+    };
 
-//             //xu ly viec nhan nut delete
-//             button2.addEventListener('click', (e) => {
-//                 list_el.removeChild(task);
-//             })
+    const mouseMoveHandler = function (e) {
+        const draggingRect = draggingEle.getBoundingClientRect();
 
-//         }
-//     })
-// })
+        if (!isDraggingStarted) {
+            isDraggingStarted = true;
+
+            // Let the placeholder take the height of dragging element
+            // So the next element won't move up
+            placeholder = document.createElement('div');
+            placeholder.classList.add('placeholder');
+            draggingEle.parentNode.insertBefore(placeholder, draggingEle.nextSibling);
+            placeholder.style.height = `${draggingRect.height}px`;
+        }
+
+        // Set position for dragging element
+        draggingEle.style.position = 'absolute';
+        draggingEle.style.top = `${e.pageY - y}px`;
+        draggingEle.style.left = `${e.pageX - x}px`;
+
+        // The current order
+        // prevEle
+        // draggingEle
+        // placeholder
+        // nextEle
+        const prevEle = draggingEle.previousElementSibling;
+        const nextEle = placeholder.nextElementSibling;
+
+        // The dragging element is above the previous element
+        // User moves the dragging element to the top
+        if (prevEle && isAbove(draggingEle, prevEle)) {
+            // The current order    -> The new order
+            // prevEle              -> placeholder
+            // draggingEle          -> draggingEle
+            // placeholder          -> prevEle
+            swap(placeholder, draggingEle);
+            swap(placeholder, prevEle);
+            return;
+        }
+
+        // The dragging element is below the next element
+        // User moves the dragging element to the bottom
+        if (nextEle && isAbove(nextEle, draggingEle)) {
+            // The current order    -> The new order
+            // draggingEle          -> nextEle
+            // placeholder          -> placeholder
+            // nextEle              -> draggingEle
+            swap(nextEle, placeholder);
+            swap(nextEle, draggingEle);
+        }
+    };
+
+    const mouseUpHandler = function () {
+        // Remove the placeholder
+        placeholder && placeholder.parentNode.removeChild(placeholder);
+
+        draggingEle.style.removeProperty('top');
+        draggingEle.style.removeProperty('left');
+        draggingEle.style.removeProperty('position');
+
+        x = null;
+        y = null;
+        draggingEle = null;
+        isDraggingStarted = false;
+
+        // Remove the handlers of `mousemove` and `mouseup`
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
+    };
+
+    // Query all items
+    [].slice.call(list.querySelectorAll('.draggable')).forEach(function (item) {
+        item.addEventListener('mousedown', mouseDownHandler);
+    });
+});

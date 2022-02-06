@@ -1,6 +1,5 @@
 import React from 'react';
-
-const ToDo = ({todo, editlist ,handletoggle}) => {
+const ToDo = ({todo, editlist ,handletoggle,i}) => {
 
     const handleEdit=(e)=>{
         e.preventDefault();
@@ -35,16 +34,20 @@ const ToDo = ({todo, editlist ,handletoggle}) => {
       
     }
  
+
+    
     return (
         <div id={todo.id+"task"} className="task">
                     <div className="content">
-                        <input id={todo.id} type="text" className={todo.complete? "text strike": "text"} onClick={handleClick} placeholder={todo.task} defaultValue={todo.task}  readOnly/>
+                        <input id={todo.id} type="text" className={todo.complete? "text caret-hidden strike": "caret-hidden text"} onClick={handleClick} placeholder={todo.task} defaultValue={todo.task}  readOnly/>
                     </div>
                     <div className="actions">
                         <button className="edit" onClick={handleEdit} value={todo.id}>Edit</button>
                         <button className="delete" onClick={handleDelete}  value={todo.id}>Delete</button>
+                    
                     </div>
         </div>
+        
     );
 };
 

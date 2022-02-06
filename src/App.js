@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+
 import './App.css';
 import React, {useState} from 'react';
 //mock data
@@ -7,7 +7,6 @@ import data from './data.json';
 //components
 import Header from "./Header";
 import ToDoList from "./ToDoList";
-import ToDoForm from './TodoForm';
 import ButtonClear from './ToDoClear';
 function App() {
   const [ toDoList, setToDoList ] = useState(data);
@@ -35,18 +34,14 @@ function App() {
 
   }
   const HandleClear1=function(){
-    let item=toDoList.filter(element=>{
-  
-      return element.complete==false;
-    })
-  
-
+    
+    let item=[];
     setToDoList(item);
   }
   const addTask=(task)=>{
     for(let i=0;i<toDoList.length;i++)
     {
-      if(toDoList[i].task==task)
+      if(toDoList[i].task===task)
       {
         alert("Task existed. Please type another task");
         return;
