@@ -17,7 +17,7 @@ const ToDoForm =({addTask})=>{
         setUserInput(e.currentTarget.value);
     }
     return(
-        <form id="new-task-form">
+        <form onSubmit={handleSubmit} id="new-task-form">
             <input value={userInput} name="new-text-input" id="new-task-input" type="text" onChange={handleChange} placeholder="Please input task"/>
             <input type="submit" id="new-task-submit" value="Add task" />
         </form>  
